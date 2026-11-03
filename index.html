@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Практична робота № 2 — Пошук матеріалів в Інтернеті та їх оцінювання</title>
+<style>
+:root{--bg:#f6f2e9;--card:#ffffff;--ink:#1b2540;--muted:#5a6482;--line:#ddd6c6;--accent:#2f5fd0;--accent-ink:#ffffff;--soft:#e3ebfb;--ok:#1d6b3a;--okbg:#dff3e6;--bad:#9b2c2c;--badbg:#fde4e1;--warn:#fde8cf;--input:#fbf9f4}
+@media (prefers-color-scheme:dark){:root{--bg:#121a2f;--card:#1c2745;--ink:#f1eee6;--muted:#aab3cc;--line:#37436b;--soft:#26335c;--ok:#8fe0ac;--okbg:#1c3a2a;--bad:#ffb3aa;--badbg:#4a2326;--warn:#4a3a1f;--input:#16203a}}
+body[data-v="A"]{--accent:#4a46c9;--soft:#e8e7fb}
+body[data-v="B"]{--accent:#0f7b83;--soft:#d9f1f2}
+body[data-v="C"]{--accent:#c25e00;--soft:#fde8cf}
+body[data-v="D"]{--accent:#b3265a;--soft:#fbe0ea}
+@media (prefers-color-scheme:dark){body[data-v="A"]{--accent:#a7a4ff;--accent-ink:#1b1a52;--soft:#2b2a5e}body[data-v="B"]{--accent:#6fd6dc;--accent-ink:#06383c;--soft:#18444a}body[data-v="C"]{--accent:#ffb067;--accent-ink:#4a2500;--soft:#4a3320}body[data-v="D"]{--accent:#ff9ab9;--accent-ink:#4d0d26;--soft:#4d2237}body:not([data-v]){--accent:#8fb0ff;--accent-ink:#102252}}
+*{box-sizing:border-box}
+html{scroll-padding-top:90px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito","Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.5;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+main{max-width:920px;margin:0 auto;padding:16px 16px 80px}
+h1,h2,h3{font-family:"Rubik","Segoe UI",Arial,sans-serif;line-height:1.2;margin:0}
+.hero{background:linear-gradient(135deg,var(--accent),#1b2540);color:#fff;border-radius:24px;padding:28px;margin:8px 0 20px}
+.hero h1{font-size:30px;margin-bottom:6px}
+.hero p{margin:4px 0;opacity:.95}
+.badge{display:inline-block;background:rgba(255,255,255,.2);border-radius:99px;padding:2px 14px;font-weight:700;font-size:15px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin:0 0 18px}
+.top{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.top .who{font-weight:700}
+.timer{font-family:"Rubik",Arial,sans-serif;font-size:24px;font-weight:700;min-width:84px;text-align:center;background:var(--soft);border-radius:12px;padding:2px 12px}
+.timer.late{background:var(--badbg);color:var(--bad)}
+.bar{flex:1;min-width:140px;height:12px;background:var(--soft);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.small{font-size:15px;color:var(--muted)}
+.tag{display:inline-block;background:var(--soft);color:var(--ink);font-weight:700;font-size:14px;padding:2px 12px;border-radius:99px;margin-right:6px}
+.tcard h2{font-size:22px;margin:6px 0 6px}
+.tcard .ico{font-size:26px;margin-right:6px}
+.tcard.done{border-color:var(--accent);box-shadow:0 0 0 2px var(--soft)}
+label.f{display:block;margin:12px 0}
+label.f>span{display:block;font-weight:700;margin-bottom:4px}
+input[type=text],input[type=url],textarea,select{font:inherit;width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--input);color:var(--ink)}
+textarea{min-height:84px;resize:vertical}
+fieldset{border:1px solid var(--line);border-radius:12px;margin:12px 0;padding:8px 12px}
+legend{font-weight:700;padding:0 6px}
+label.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:12px;margin:6px 0;cursor:pointer}
+label.opt input{width:20px;height:20px;margin-top:3px;flex:none;accent-color:var(--accent)}
+.it{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0}
+.it>p{margin:0 0 6px;font-weight:700}
+.it.ok{background:var(--okbg);border-color:var(--ok)}
+.it.bad{background:var(--badbg);border-color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:99px;padding:6px 14px;cursor:pointer;background:var(--card)}
+.chips input{accent-color:var(--accent)}
+.fb{font-size:16px;margin:6px 0 0;font-weight:600}
+.it.ok .fb{color:var(--ok)}.it.bad .fb{color:var(--bad)}
+button{font:inherit;font-weight:700;background:var(--accent);color:var(--accent-ink);border:0;border-radius:12px;padding:10px 20px;cursor:pointer;margin:8px 8px 0 0}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button:disabled{opacity:.5;cursor:default}
+.res{margin-top:10px;font-weight:700}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.vcard{border:2px solid var(--line);border-radius:18px;padding:16px;cursor:pointer;background:var(--card);text-align:left;color:var(--ink);font-weight:400;margin:0;display:block;width:100%}
+.vcard b{font-family:"Rubik",Arial,sans-serif;font-size:20px;display:block;margin:4px 0}
+.vcard.sel{border-color:var(--accent);background:var(--soft)}
+.vcard .e{font-size:34px}
+.warn{background:var(--warn);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-weight:600}
+.story{background:var(--soft);border-radius:16px;padding:14px 18px;margin:0 0 18px}
+textarea.out{min-height:160px;font-size:15px;font-family:Consolas,monospace}
+@media print{.top button,.noprint,button{display:none!important}.top{position:static}body{background:#fff;color:#000}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===== helpers ===== */
+var TOTAL_MIN=45, LS='pr2_5kl_v1', storageOk=true;
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function load(){try{var s=localStorage.getItem(LS);return s?JSON.parse(s):null}catch(e){storageOk=false;return null}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){storageOk=false}}
+try{localStorage.setItem(LS+'_t','1');localStorage.removeItem(LS+'_t')}catch(e){storageOk=false}
+var state=load()||{a:{},c:{}};
+state.a=state.a||{};state.c=state.c||{};
+var $=function(s,r){return (r||document).querySelector(s)};
+
+/* field builders */
+function I(l,min){return {k:'input',l:l,min:min||2}}
+function A(l,min){return {k:'area',l:l,min:min||15}}
+function U(l){return {k:'url',l:l}}
+function S(l,o){return {k:'select',l:l,o:o}}
+function C(l,o){return {k:'checks',l:l,o:o}}
+var RELI=['Надійне','Сумнівне','Ненадійне'];
+var CRIT=['Є автор або організація','Є дата створення чи оновлення','Немає нав’язливої реклами й криків','Те саме написано ще на інших сайтах'];
+
+/* ===== variants ===== */
+var VARIANTS={
+A:{e:'🕵️',name:'Детективна справа',tag:'Доведи правду джерелами',
+ desc:'Перевіряєш твердження з чату: шукаєш 3 джерела, оцінюєш їх і виносиш вердикт.',
+ story:'У шкільному чаті хтось написав: <b>«Кити — це риби, бо живуть у воді»</b>. Ти — інтернет-детектив. З’ясуй правду й доведи її джерелами.',
+ tasks:[
+ {id:'A1',ico:'🔎',title:'Розминка: пошукові запити',min:4,type:'quiz',desc:'Пошукова система шукає за словами, які ти вводиш у запит.',items:[
+  {q:'Який запит найкраще допоможе перевірити твердження про китів?',opts:['кити','кит риба чи ссавець','найцікавіші кити ЩОК!!!','купити кита'],ans:[1],why:'Запит із ключовими словами про саме питання дає точні результати.'},
+  {q:'Що таке ключові слова?',opts:['Найважливіші слова запиту, що описують тему','Паролі до сайту','Назва комп’ютера'],ans:[0],why:'Ключові слова описують, що саме ти шукаєш.'},
+  {q:'Які сайти шукають інформацію в Інтернеті за запитом?',opts:['Пошукові системи (Google, Bing)','Месенджери','Текстові редактори'],ans:[0],why:'Google і Bing — пошукові системи.'}]},
+ {id:'A2',ico:'⌨️',title:'Три запити',min:6,type:'fields',pts:3,desc:'Відкрий пошукову систему в новій вкладці (Ctrl + T) і спробуй три запити.',fields:[I('Запит 1 — найпростіший'),I('Запит 2 — з іншими або уточнювальними словами'),I('Запит 3 — у формі запитання'),A('Який запит дав найкращі результати і чому?',15)]},
+ {id:'A3',ico:'📚',title:'Знайди три джерела',min:10,type:'fields',pts:6,desc:'Обери три різні сторінки, які відповідають на питання про китів.',fields:[1,2,3].reduce(function(r,n){return r.concat([I('Джерело '+n+': назва сторінки або сайту'),U('Джерело '+n+': посилання'),A('Джерело '+n+': що там сказано про китів (своїми словами)',20)])},[])},
+ {id:'A4',ico:'🚦',title:'Оціни джерела',min:8,type:'fields',pts:6,desc:'Для кожного з трьох джерел познач, що ти знайшов(-ла), і визнач надійність.',fields:[1,2,3].reduce(function(r,n){return r.concat([C('Джерело '+n+': критерії',CRIT),S('Джерело '+n+': вердикт',RELI)])},[]).concat([A('Яке джерело найнадійніше і чому?',20)])},
+ {id:'A5',ico:'⚖️',title:'Факт чи судження?',min:5,type:'pick',labels:['Факт','Судження'],items:[
+  {q:'Кит дихає легенями.',ans:0,why:'Це можна перевірити — факт.'},
+  {q:'Кити — найкрасивіші тварини на Землі.',ans:1,why:'«Найкрасивіші» — чиясь думка.'},
+  {q:'Кит вигодовує дитинча молоком.',ans:0,why:'Це перевірений факт.'},
+  {q:'Про китів цікаво читати.',ans:1,why:'Цікавість — оцінка, а не факт.'},
+  {q:'Блакитний кит — одна з найбільших тварин, що будь-коли жили на Землі.',ans:0,why:'Це підтверджують наукові джерела.'},
+  {q:'Кити не повинні жити в акваріумах.',ans:1,why:'«Повинні» — думка.'}]},
+ {id:'A6',ico:'⚖️',title:'Вердикт',min:6,type:'quiz',desc:'Підсумуй розслідування.',items:[
+  {q:'Яке твердження правильне?',opts:['Кит — риба, бо плаває','Кит — ссавець: дихає легенями й вигодовує дитинча молоком','Кит — земноводне'],ans:[1],why:'Кит належить до ссавців.'}],fields:[A('Що ти відповіси однокласнику в чаті? Додай назву джерела.',30)]},
+ {id:'A7',ico:'©️',title:'Авторське право',min:6,type:'quiz',desc:'Хочеш вставити фото кита у презентацію.',items:[
+  {q:'Що потрібно зробити з чужим фото?',opts:['Вказати автора, назву і посилання на сторінку','Нічого не писати','Підписати своїм ім’ям'],ans:[0],why:'Чужу роботу завжди підписують автором і джерелом.'},
+  {q:'Чи можна видавати чужий текст за свій?',opts:['Так, якщо його складно знайти','Ні, це порушення авторського права'],ans:[1],why:'Чужий текст потрібно цитувати з посиланням.'}],fields:[U('Посилання на фото кита'),I('Автор фото або сайт-джерело')]}
+ ]},
+B:{e:'🗂️',name:'Досьє-проєкт',tag:'Зберіть мініпроєкт про тему',
+ desc:'Обираєш тему й збираєш досьє: запити, два джерела, зображення, факти й судження.',
+ story:'Ти складаєш <b>досьє на тему на вибір</b> для шкільної виставки. Кожне джерело треба оцінити, а зображення — правильно підписати.',
+ tasks:[
+ {id:'B1',ico:'🎯',title:'Обери тему',min:3,type:'fields',pts:2,fields:[S('Тема досьє',['Тварини України','Космос','Українські винаходи і винахідники','Карпати','Мій улюблений вид спорту']),A('Три запитання, на які ти шукатимеш відповіді',20)]},
+ {id:'B2',ico:'🔎',title:'Як шукати',min:4,type:'quiz',items:[
+  {q:'Як отримати точніші результати?',opts:['Додати до запиту уточнювальне слово','Писати запит великими літерами','Залишити в запиті лише одне слово'],ans:[0],why:'Уточнення звужує пошук.'},
+  {q:'Де зручно шукати зображення?',opts:['На вкладці «Зображення» пошукової системи','У калькуляторі','У налаштуваннях комп’ютера'],ans:[0],why:'Пошукові системи мають окрему вкладку для зображень.'},
+  {q:'У результатах нічого схожого. Що робити?',opts:['Змінити слова запиту або спробувати схожі слова','Закрити браузер','Обрати перший-ліпший сайт'],ans:[0],why:'Нові слова — нові результати.'},
+  {q:'Що позначає знак на початку адреси сайту — https?',opts:['Захищене з’єднання з сайтом','Що сайт точно правдивий','Що на сайті немає реклами'],ans:[0],why:'https — захищене з’єднання, але це ще не доказ правдивості.'}]},
+ {id:'B3',ico:'⌨️',title:'Журнал запитів',min:6,type:'fields',pts:3,desc:'Запиши три різні запити за своєю темою й результат.',fields:[1,2,3].reduce(function(r,n){return r.concat([I('Запит '+n),I('Що знайшов(-ла) / чи допомогло?',5)])},[])},
+ {id:'B4',ico:'📇',title:'Дві картки джерел',min:12,type:'fields',pts:8,desc:'Обери два надійні джерела й заповни картки.',fields:[1,2].reduce(function(r,n){return r.concat([I('Джерело '+n+': назва'),U('Джерело '+n+': посилання'),I('Автор або організація'),I('Дата створення чи оновлення'),S('Надійність',RELI),A('Чому ти так вважаєш?',20)])},[])},
+ {id:'B5',ico:'🖼️',title:'Зображення з підписом',min:6,type:'fields',pts:4,fields:[U('Посилання на сторінку із зображенням'),I('Автор або сайт-джерело'),A('Чому ти обрав(-ла) саме це зображення?',15),C('Підпис під зображенням у досьє',['Вказано автора','Вказано посилання на сторінку','Вказано назву зображення'])]},
+ {id:'B6',ico:'⚖️',title:'Факти й судження',min:6,type:'fields',pts:6,fields:[I('Факт 1',8),I('Факт 2',8),I('Факт 3',8),I('Одне судження про тему (думка, оцінка)',8),A('Чим судження відрізняється від факту?',15)]},
+ {id:'B7',ico:'⚖️',title:'Швидка перевірка: факт чи судження?',min:5,type:'pick',labels:['Факт','Судження'],items:[
+  {q:'Україна межує з Польщею.',ans:0,why:'Це можна перевірити на карті.'},
+  {q:'Зима — найкраща пора року.',ans:1,why:'«Найкраща» — чиясь думка.'},
+  {q:'Вода кипить при 100 °C на рівні моря.',ans:0,why:'Перевірений науковий факт.'},
+  {q:'Цей мультфільм нудний.',ans:1,why:'Оцінка залежить від людини.'}]},
+ {id:'B8',ico:'🏁',title:'Висновок',min:4,type:'fields',pts:3,fields:[A('Яке джерело було найнадійнішим і чому? Що було найважче?',40),S('Оціни свою роботу',['1','2','3','4','5'])]}
+ ]},
+C:{e:'🧭',name:'Квест із 5 станцій',tag:'Швидкі завдання з автоперевіркою',
+ desc:'П’ять станцій: запити, зображення, світлофор надійності, факт чи судження, авторське право.',
+ story:'Ти проходиш <b>квест юного дослідника</b>. Більшість завдань перевіряються автоматично, тож одразу бачиш, де помилився.',
+ tasks:[
+ {id:'C1',ico:'🔎',title:'Станція 1. Запит',min:8,type:'quiz',desc:'Один пункт треба знайти в Інтернеті.',items:[
+  {q:'Хочеш дізнатися, скільки років живе слон. Який запит кращий?',opts:['слон','скільки років живе слон','слони — це круто','слон купити'],ans:[1],why:'Запит повинен описувати питання.'},
+  {q:'Нічого не знайшов(-ла). Що зробити?',opts:['Змінити або додати слова в запит','Здатися','Писати запит більшими літерами'],ans:[0],why:'Інші слова дають інші результати.'},
+  {q:'Де шукати фото Карпат для проєкту?',opts:['На вкладці «Зображення» пошукової системи','У текстовому редакторі'],ans:[0],why:'Для картинок є окрема вкладка.'},
+  {q:'Знайди в Інтернеті висоту Говерли (найвища гора України) і запиши число в метрах.',input:true,accept:[/^2061(м|m)?$/],ph:'число',why:'Висота Говерли — 2061 м.'}],fields:[U('Посилання на сторінку, де ти знайшов(-ла) висоту')]},
+ {id:'C2',ico:'🖼️',title:'Станція 2. Зображення',min:8,type:'quiz',desc:'Знайди зображення Говерли та заповни дані.',items:[
+  {q:'Який параметр допоможе знайти зображення, які дозволено використовувати?',opts:['Розмір','Колір','Права на використання (ліцензія)','Тип зображення'],ans:[2],why:'Права на використання показують, що можна робити із зображенням.'}],fields:[I('Який запит ти ввів(-ла) для зображення?'),U('Посилання на сторінку із зображенням'),I('Автор або сайт-джерело')]},
+ {id:'C3',ico:'🚦',title:'Станція 3. Світлофор надійності',min:8,type:'pick',labels:['Надійний','Сумнівний','Ненадійний'],items:[
+  {q:'Сайт бібліотеки: адреса, автор статті й дата оновлення.',ans:0,why:'Є автор, дата й організація.'},
+  {q:'Сторінка без автора й дати, на ній десять спливаючих реклам.',ans:2,why:'Немає даних про автора, багато реклами.'},
+  {q:'Шкільний блог: цікаво написано, але джерел немає.',ans:1,why:'Без джерел перевірити складно.'},
+  {q:'Енциклопедія з авторами статей і посиланнями на джерела.',ans:0,why:'Усе можна перевірити.'},
+  {q:'Сайт обіцяє: «Заробіть мільйон за день! Тисни тут!»',ans:2,why:'Гучні обіцянки й заклик клікнути — ознаки пастки.'},
+  {q:'Допис у соцмережі без підтвердження іншими джерелами.',ans:1,why:'Потрібно перевірити на інших сайтах.'}]},
+ {id:'C4',ico:'⚖️',title:'Станція 4. Факт чи судження?',min:8,type:'pick',labels:['Факт','Судження'],items:[
+  {q:'Говерла — найвища гора України.',ans:0,why:'Це перевірений факт.'},
+  {q:'Карпати — найгарніші гори.',ans:1,why:'«Найгарніші» — думка.'},
+  {q:'Дніпро впадає в Чорне море.',ans:0,why:'Факт, його видно на карті.'},
+  {q:'Борщ — найсмачніша страва.',ans:1,why:'Смак — оцінка.'},
+  {q:'У тижні сім днів.',ans:0,why:'Факт.'},
+  {q:'Математика — нудний предмет.',ans:1,why:'Це чиясь думка.'},
+  {q:'Земля має один природний супутник.',ans:0,why:'Факт: це Місяць.'},
+  {q:'Кіт — найкращий домашній улюбленець.',ans:1,why:'Це чиясь думка.'}]},
+ {id:'C5',ico:'©️',title:'Станція 5. Авторське право й безпека',min:7,type:'quiz',items:[
+  {q:'Що робити, якщо вставляєш чуже фото у презентацію?',opts:['Вказати автора й посилання','Нічого не писати','Підписати своїм ім’ям'],ans:[0],why:'Чужу роботу підписують автором і джерелом.'},
+  {q:'Що потрібно вказати? (кілька відповідей)',opts:['Автора','Посилання на джерело','Свій номер телефону','Назву сайту або сторінки'],ans:[0,1,3],multi:true,why:'Автор, джерело й назва допомагають знайти оригінал.'},
+  {q:'Чи можна завантажувати файли з невідомих сайтів?',opts:['Так, усі файли безпечні','Ні, лише з надійних джерел і з дозволу вчителя'],ans:[1],why:'Файли можуть бути небезпечними.'}]},
+ {id:'C6',ico:'🏁',title:'Фініш',min:6,type:'fields',pts:3,fields:[A('Склади «пам’ятку юного дослідника»: 3 правила пошуку й перевірки інформації',40),S('Яка станція була найцікавішою?',['1 Запит','2 Зображення','3 Світлофор','4 Факт чи судження','5 Авторське право'])]}
+ ]},
+D:{e:'🕶️',name:'Мисливці за фейками',tag:'Відрізни правду від вигадки',
+ desc:'Оцінюєш «новини», розпізнаєш ознаки фейків і сам(-а) перевіряєш міфи в Інтернеті.',
+ story:'У стрічці новин повно «сенсацій». Ти — <b>мисливець за фейками</b>: відділи правду від вигадки й знайди докази.',
+ tasks:[
+ {id:'D1',ico:'📰',title:'Стрічка новин: правда чи фейк?',min:10,type:'pick',labels:['Правда','Фейк'],items:[
+  {q:'Блискавка ніколи не б’є двічі в одне місце.',ans:1,why:'Це міф: блискавка може влучати в одне місце багато разів.'},
+  {q:'Кити — ссавці.',ans:0,why:'Правда: кити дихають легенями й вигодовують дитинчат молоком.'},
+  {q:'Людина використовує лише 10 % мозку.',ans:1,why:'Це поширений міф.'},
+  {q:'Вода в морях і океанах солона.',ans:0,why:'Правда.'},
+  {q:'Золота рибка пам’ятає лише 3 секунди.',ans:1,why:'Міф: рибки запам’ятовують багато речей.'},
+  {q:'Земля обертається навколо Сонця.',ans:0,why:'Правда.'},
+  {q:'Страуси ховають голову в пісок, коли бояться.',ans:1,why:'Міф.'},
+  {q:'Дніпро — найдовша річка, що протікає територією України.',ans:0,why:'Правда.'}]},
+ {id:'D2',ico:'🚩',title:'Ознаки фейку',min:8,type:'pick',labels:['Гучні слова й емоції','Немає джерела й автора','Заклик перейти за посиланням','Суперечить перевіреним фактам'],desc:'Обери головну ознаку.',items:[
+  {q:'«СЕНСАЦІЯ!!! ЖАХ!!! Усі в паніці, дивіться негайно!!!»',ans:0,why:'Крики й емоції замість фактів.'},
+  {q:'«Один знайомий казав, що завтра скасують уроки». Хто знайомий — невідомо.',ans:1,why:'Немає джерела, перевірити неможливо.'},
+  {q:'«Натисни тут і отримай 10 000 грн безкоштовно!»',ans:2,why:'Заклик клікнути — ознака шахрайства.'},
+  {q:'«Золота рибка пам’ятає лише 3 секунди».',ans:3,why:'Це суперечить перевіреним даним.'}]},
+ {id:'D3',ico:'🔬',title:'Перевір сам(-а)',min:10,type:'fields',pts:8,desc:'Оціни два «міфи» зі стрічки новин: знайди підтвердження в Інтернеті.',fields:[1,2].reduce(function(r,n){return r.concat([S('Міф '+n,['Блискавка б’є двічі в одне місце','Людина використовує лише 10 % мозку','Золота рибка пам’ятає 3 секунди','Страуси ховають голову в пісок']),I('Запит, який ти ввів(-ла)'),U('Посилання на джерело'),A('Що ти знайшов(-ла)? Чи правда це? Поясни своїми словами',25)])},[])},
+ {id:'D4',ico:'🎨',title:'Створи спростування',min:8,type:'fields',pts:6,fields:[A('Придумай власний навчальний «фейк» (безпечний, без образ)',20),A('Як перевірити його за три кроки?',30),A('Яке спростування ти напишеш?',20)]},
+ {id:'D5',ico:'🛡️',title:'Безпека й авторське право',min:5,type:'quiz',items:[
+  {q:'«Друг» надіслав посилання на безкоштовні гроші. Що робити?',opts:['Натиснути, щоб перевірити','Не натискати, написати другові іншим способом і сказати дорослим'],ans:[1],why:'Такі посилання часто шахрайські.'},
+  {q:'Чи варто пересилати новину, якщо ти її не перевірив(-ла)?',opts:['Так, усім цікаво','Ні, спочатку перевіряю'],ans:[1],why:'Так фейки й поширюються.'},
+  {q:'Що вказати, використовуючи чужу картинку?',opts:['Автора і посилання','Нічого','Свою адресу'],ans:[0],why:'Автор і джерело.'}]},
+ {id:'D6',ico:'🏁',title:'Девіз мисливця',min:4,type:'fields',pts:2,fields:[A('Склади девіз або правило мисливця за фейками',20)]}
+ ]}
+};
+
+/* ===== evaluation ===== */
+function norm(s){return String(s==null?'':s).toLowerCase().replace(/[\s\u00a0.,]/g,'')}
+function ak(t,i){return t.id+'.'+i}
+function fk(t,i){return t.id+'.f'+i}
+function itemOk(t,it,i){var v=state.a[ak(t,i)];
+ if(it.input)return it.accept.some(function(r){return r.test(norm(v))});
+ if(t.type==='pick')return v===it.ans;
+ if(v==null)return false;
+ var arr=Array.isArray(v)?v.slice().sort():[v];var want=it.ans.slice().sort();
+ return arr.length===want.length&&arr.every(function(x,j){return x===want[j]})}
+function itemAnswered(t,it,i){var v=state.a[ak(t,i)];return it.input?norm(v)!=='':(Array.isArray(v)?v.length>0:v!=null)}
+function fieldOk(f,v){if(f.k==='checks')return true;if(v==null)return false;v=String(v).trim();
+ if(f.k==='url')return /^https?:\/\/\S+\.\S+/i.test(v);if(f.k==='select')return v!=='';return v.length>=(f.min||1)}
+function fieldsDone(t){var fs=t.fields||[];return fs.every(function(f,i){return fieldOk(f,state.a[fk(t,i)])})}
+function fieldsFilled(t){var fs=t.fields||[];return fs.filter(function(f,i){return fieldOk(f,state.a[fk(t,i)])}).length}
+function autoScore(t){if(!t.items)return {sc:0,max:0};var sc=0;t.items.forEach(function(it,i){if(itemOk(t,it,i))sc++});return {sc:sc,max:t.items.length}}
+function taskDone(t){var auto=!!t.items;var ok=true;if(auto)ok=(state.c[t.id]||0)>0;if(t.fields)ok=ok&&fieldsDone(t);return ok}
+
+/* ===== render ===== */
+function fieldHtml(t,f,i){var key=fk(t,i),v=state.a[key];
+ if(f.k==='input')return '<label class="f"><span>'+esc(f.l)+'</span><input type="text" data-k="'+key+'" value="'+esc(v)+'"></label>';
+ if(f.k==='url')return '<label class="f"><span>'+esc(f.l)+'</span><input type="url" placeholder="https://…" data-k="'+key+'" value="'+esc(v)+'"></label>';
+ if(f.k==='area')return '<label class="f"><span>'+esc(f.l)+'</span><textarea data-k="'+key+'">'+esc(v)+'</textarea></label>';
+ if(f.k==='select')return '<label class="f"><span>'+esc(f.l)+'</span><select data-k="'+key+'"><option value="">— обери —</option>'+f.o.map(function(o){return '<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'</select></label>';
+ var arr=Array.isArray(v)?v:[];
+ return '<fieldset><legend>'+esc(f.l)+'</legend>'+f.o.map(function(o,j){return '<label class="opt"><input type="checkbox" data-k="'+key+'" data-opt="'+j+'"'+(arr.indexOf(j)>-1?' checked':'')+'> <span>'+esc(o)+'</span></label>'}).join('')+'</fieldset>'}
+function itemHtml(t,it,i){var key=ak(t,i),v=state.a[key],att=state.c[t.id]||0,cls='',fb='';
+ if(att>0){var ok=itemOk(t,it,i),an=itemAnswered(t,it,i);cls=ok?' ok':(an?' bad':' bad');
+  fb=ok?'✓ Правильно. '+esc(it.why):(!an?'Відповідь не обрано.':(att>=2?'✗ '+esc(it.why):'✗ Подумай ще раз і перевір.'))}
+ var body='';
+ if(it.input)body='<input type="text" inputmode="numeric" placeholder="'+esc(it.ph||'')+'" data-k="'+key+'" value="'+esc(v)+'">';
+ else if(t.type==='pick')body='<div class="chips">'+t.labels.map(function(l,j){return '<label><input type="radio" name="'+key+'" data-k="'+key+'" value="'+j+'"'+(v===j?' checked':'')+'> '+esc(l)+'</label>'}).join('')+'</div>';
+ else{var multi=!!it.multi;body=it.opts.map(function(o,j){var chk=multi?(Array.isArray(v)&&v.indexOf(j)>-1):v===j;
+  return '<label class="opt"><input type="'+(multi?'checkbox':'radio')+'" name="'+key+'" data-k="'+key+'" data-opt="'+j+'" value="'+j+'"'+(chk?' checked':'')+'> <span>'+esc(o)+'</span></label>'}).join('')}
+ return '<div class="it'+cls+'"><p>'+(i+1)+'. '+esc(it.q)+'</p>'+body+(fb?'<p class="fb">'+fb+'</p>':'')+'</div>'}
+function taskHtml(t){var h='<section class="card tcard'+(taskDone(t)?' done':'')+'" id="t_'+t.id+'" data-t="'+t.id+'">';
+ h+='<span class="tag">⏱ ~'+t.min+' хв</span><span class="tag">'+(t.items?'Автоперевірка':'Оцінює вчитель'+(t.pts?' · до '+t.pts+' б.':''))+'</span>';
+ h+='<h2><span class="ico">'+t.ico+'</span>'+esc(t.title)+'</h2>';
+ if(t.desc)h+='<p class="small">'+t.desc+'</p>';
+ if(t.items){h+=t.items.map(function(it,i){return itemHtml(t,it,i)}).join('');
+  h+='<button data-act="check" data-t="'+t.id+'">Перевірити</button>';
+  var att=state.c[t.id]||0;if(att>0){var r=autoScore(t);h+='<span class="res">Результат: '+r.sc+' з '+r.max+(r.sc<r.max?' — можна виправити й перевірити ще раз':' 🎉')+'</span>'}}
+ if(t.fields)h+=t.fields.map(function(f,i){return fieldHtml(t,f,i)}).join('')+'<p class="small chip" data-chip="'+t.id+'">Заповнено: '+fieldsFilled(t)+' з '+t.fields.length+'</p>';
+ return h+'</section>'}
+
+function render(){document.body.removeAttribute('data-v');
+ var app=$('#app');
+ if(!state.v||!VARIANTS[state.v]){app.innerHTML=startHtml();return}
+ document.body.setAttribute('data-v',state.v);
+ var V=VARIANTS[state.v];
+ var h='<div class="top"><div class="who">'+esc(state.name)+' · '+esc(state.cls||'')+' · варіант '+state.v+'</div><div class="timer" id="timer">45:00</div><div class="bar"><i id="barfill"></i></div><div class="small" id="prog"></div></div><main>';
+ if(!storageOk)h+='<div class="warn">⚠️ Браузер не дозволяє зберігати дані. Не закривай і не оновлюй сторінку, а наприкінці скопіюй результат.</div>';
+ h+='<div class="hero"><span class="badge">Практична робота № 2 · '+V.e+' варіант '+state.v+'</span><h1>'+esc(V.name)+'</h1><p>Пошук матеріалів в Інтернеті та їх оцінювання</p></div>';
+ h+='<div class="story">'+V.story+'</div>';
+ h+='<p class="small noprint">Відповіді зберігаються автоматично. Кожен сайт відкривай у новій вкладці (Ctrl + T), на рекламу не натискай, нічого не завантажуй.</p>';
+ h+=V.tasks.map(taskHtml).join('');
+ h+='<section class="card" id="result"></section></main>';
+ app.innerHTML=h;renderResult();tick();updateProgress()}
+
+function startHtml(){var sel=state.pick||(new URLSearchParams(location.search).get('v')||'').toUpperCase();if(!VARIANTS[sel])sel='';
+ var h='<main><div class="hero"><span class="badge">5 клас · Інформатика</span><h1>Практична робота № 2</h1><p>Пошук матеріалів в Інтернеті та їх оцінювання</p><p class="small" style="color:#fff">На виконання — 45 хвилин. Відповіді зберігаються автоматично.</p></div>';
+ if(!storageOk)h+='<div class="warn">⚠️ Браузер не дозволяє зберігати дані: після оновлення сторінки відповіді буде втрачено.</div>';
+ h+='<div class="card"><label class="f"><span>Прізвище та ім’я</span><input type="text" id="nm" value="'+esc(state.name)+'"></label><label class="f"><span>Клас</span><input type="text" id="cl" value="'+esc(state.cls)+'" placeholder="наприклад, 5-А"></label></div>';
+ h+='<h2 style="margin:6px 0 12px">Обери варіант</h2><div class="vgrid">'+Object.keys(VARIANTS).map(function(k){var V=VARIANTS[k];return '<button class="vcard'+(sel===k?' sel':'')+'" data-act="pick" data-v="'+k+'"><span class="e">'+V.e+'</span><b>Варіант '+k+'. '+esc(V.name)+'</b><span class="small">'+esc(V.desc)+'</span></button>'}).join('')+'</div>';
+ h+='<p><button data-act="random" class="ghost">🎲 Випадковий варіант</button><button data-act="start">Почати роботу</button></p><p class="small" id="serr"></p></main>';return h}
+
+function renderResult(){var el=$('#result');if(!el)return;var V=VARIANTS[state.v],sc=0,max=0,done=0,n=V.tasks.length;
+ V.tasks.forEach(function(t){var r=autoScore(t);if((state.c[t.id]||0)>0)sc+=r.sc;max+=r.max;if(taskDone(t))done++});
+ var el2=elapsed();
+ var h='<h2>🏆 Результат</h2><p>Автоперевірка: <b>'+sc+' з '+max+'</b> балів. Завдань виконано: <b>'+done+' з '+n+'</b>. Час: <b>'+fmt(el2)+'</b>.</p><p class="small">Завдання без автоперевірки оцінює вчитель за твоїми відповідями.</p>';
+ if(!state.fin)h+='<button data-act="fin">Завершити роботу</button>';else h+='<p class="res">✅ Роботу завершено. Скопіюй результат і покажи вчителю.</p>';
+ h+='<button class="ghost" data-act="copy">Показати результат для копіювання</button><button class="ghost" data-act="print">Друк / PDF</button><button class="ghost" data-act="reset">Почати спочатку</button><div id="outwrap"></div>';el.innerHTML=h}
+
+function resultText(){var V=VARIANTS[state.v],L=[];var sc=0,max=0;
+ V.tasks.forEach(function(t){var r=autoScore(t);if((state.c[t.id]||0)>0)sc+=r.sc;max+=r.max});
+ L.push('Практична робота № 2. 5 клас');L.push('Учень: '+state.name+', '+(state.cls||'—'));L.push('Варіант '+state.v+': '+V.name);L.push('Час: '+fmt(elapsed())+'. Автоперевірка: '+sc+' з '+max);L.push('');
+ V.tasks.forEach(function(t){L.push('— '+t.title+(t.items?' ['+autoScore(t).sc+'/'+autoScore(t).max+(state.c[t.id]?'':', не перевірено')+']':''));
+  if(t.fields)t.fields.forEach(function(f,i){var v=state.a[fk(t,i)];if(f.k==='checks')v=(Array.isArray(v)?v:[]).map(function(j){return f.o[j]}).join('; ');L.push('   '+f.l+': '+(v||'—'))})});
+ return L.join('\n')}
+
+/* ===== timer & progress ===== */
+function elapsed(){if(!state.t0)return 0;return Math.max(0,Math.floor(((state.fin||Date.now())-state.t0)/1000))}
+function fmt(s){var m=Math.floor(s/60),r=s%60;return m+' хв '+(r<10?'0':'')+r+' с'}
+function tick(){var el=$('#timer');if(!el)return;var left=TOTAL_MIN*60-elapsed(),late=left<0,a=Math.abs(left);
+ el.textContent=(late?'+':'')+Math.floor(a/60)+':'+(a%60<10?'0':'')+(a%60);el.className='timer'+(late?' late':'')}
+setInterval(tick,1000);
+function updateProgress(){if(!state.v)return;var V=VARIANTS[state.v],d=0;V.tasks.forEach(function(t){if(taskDone(t))d++});
+ var f=$('#barfill'),p=$('#prog');if(f)f.style.width=Math.round(d/V.tasks.length*100)+'%';if(p)p.textContent=d+' з '+V.tasks.length+' завдань'}
+function refreshCard(id){var t=VARIANTS[state.v].tasks.filter(function(x){return x.id===id})[0],el=$('#t_'+id);if(el){var tmp=document.createElement('div');tmp.innerHTML=taskHtml(t);el.replaceWith(tmp.firstChild)}}
+
+/* ===== events ===== */
+document.addEventListener('input',onChange);document.addEventListener('change',onChange);
+function onChange(e){var el=e.target,k=el&&el.dataset&&el.dataset.k;if(!k)return;
+ if(state.v===undefined||state.v==null)return;
+ if(el.type==='checkbox'){var arr=Array.isArray(state.a[k])?state.a[k].slice():[];var j=Number(el.dataset.opt);var ix=arr.indexOf(j);if(el.checked&&ix<0)arr.push(j);if(!el.checked&&ix>-1)arr.splice(ix,1);state.a[k]=arr}
+ else if(el.type==='radio')state.a[k]=Number(el.value);
+ else state.a[k]=el.value;
+ save();updateProgress();var card=el.closest('.tcard');
+ if(card){var id=card.dataset.t,t=VARIANTS[state.v].tasks.filter(function(x){return x.id===id})[0];var chip=card.querySelector('.chip');if(chip&&t.fields)chip.textContent='Заповнено: '+fieldsFilled(t)+' з '+t.fields.length;card.classList.toggle('done',taskDone(t));}
+ renderResult()}
+document.addEventListener('input',function(e){var id=e.target.id;if(id==='nm'){state.name=e.target.value;save()}if(id==='cl'){state.cls=e.target.value;save()}});
+document.addEventListener('click',function(e){var b=e.target.closest('[data-act]');if(!b)return;var act=b.dataset.act;
+ if(act==='pick'){state.pick=b.dataset.v;save();document.querySelectorAll('.vcard').forEach(function(x){x.classList.toggle('sel',x===b)});return}
+ if(act==='random'){var ks=Object.keys(VARIANTS);state.pick=ks[Math.floor(Math.random()*ks.length)];save();render();return}
+ if(act==='start'){var sel=state.pick||(new URLSearchParams(location.search).get('v')||'').toUpperCase();
+  var nm=($('#nm').value||'').trim();if(!nm||!VARIANTS[sel]){$('#serr').textContent=!nm?'Впиши прізвище та ім’я.':'Обери варіант.';return}
+  state.name=nm;state.cls=($('#cl').value||'').trim();state.v=sel;state.t0=Date.now();state.fin=null;state.a={};state.c={};save();render();window.scrollTo(0,0);return}
+ if(act==='check'){var id=b.dataset.t;state.c[id]=(state.c[id]||0)+1;save();refreshCard(id);updateProgress();renderResult();return}
+ if(act==='fin'){state.fin=Date.now();save();renderResult();tick();return}
+ if(act==='print'){window.print();return}
+ if(act==='copy'){var w=$('#outwrap');w.innerHTML='<textarea class="out" readonly></textarea><button data-act="doCopy">Скопіювати</button>';var ta=w.querySelector('textarea');ta.value=resultText();ta.select();return}
+ if(act==='doCopy'){var ta2=$('#outwrap textarea');ta2.select();try{navigator.clipboard.writeText(ta2.value)}catch(x){document.execCommand('copy')}b.textContent='Скопійовано ✓';return}
+ if(act==='reset'){if(confirm('Стерти всі відповіді й почати спочатку?')){state={a:{},c:{}};save();render()}}});
+render();
+</script>
+</body>
+</html>
